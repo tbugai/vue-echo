@@ -5,9 +5,10 @@ module.exports = {
   assetsDir: 'assets',
   lintOnSave: false,
   devServer: {
+    port: process.env.FRONTEND_PORT,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:' + process.env.BACKEND_PORT,
         ws: true,
         changeOrigin: true
       }
