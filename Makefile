@@ -15,6 +15,7 @@ BACKEND_PORT = 9000
 FRONTEND_PORT = 8000
 
 build: clean $(TARGET)
+	@cd frontend; yarn build
 
 clean: kill
 	@printf "Cleaning up...\n"
@@ -22,10 +23,13 @@ clean: kill
 	then \
 		rm $(BACKEND_PATH)/$(TARGET); \
 	fi;
-	@if test -s $(DIST)/$(TARGET); \
+	@if test -s $(DIST_PATH)/$(TARGET); \
 	then \
-		rm $(DIST)/$(TARGET); \
+		rm $(DIST_PATH)/$(TARGET); \
 	fi;
+	@rm -rf $(DIST_PATH)/public/*
+	@touch $(DIST_PATH)/public/.gitkeep
+
 
 $(TARGET): $(GO_FILES)
 	@printf "Building '$(TARGET)'...\n"
@@ -42,5 +46,10 @@ start_backend: kill $(TARGET)
 	@BACKEND_PORT=$(BACKEND_PORT) ./$(BACKEND_PATH)/$(TARGET) -debug & echo $$! > $(PID)
 
 kill:
-		kill $(PROCESS_ID) || true
+	@kill $(PROCESS_ID) || true
 
+dist: build
+	@cp $(BACKEND_PATH)/$(TARGET) $(DIST_PATH)
+
+zip: dist
+	@cd $(DIST_PATH); zip -r ../dist.zip .
