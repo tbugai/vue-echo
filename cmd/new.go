@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/spf13/cobra"
 	"github.com/tbugai/vue-echo/utils"
@@ -24,6 +25,15 @@ var newCommand = &cobra.Command{
 			err = os.Mkdir(appName, os.ModePerm)
 		}
 		utils.Copy("template/", appName)
+
+		fmt.Printf("Fetching dependencies...\n")
+		yarn := exec.Command("yarn", "install")
+		yarn.Dir = appName + "/frontend"
+		yarn.Output()
+
+		echo := exec.Command("go", "get")
+		echo.Dir = appName + "/backend"
+		echo.Output()
 
 		fmt.Printf("\nDone.\n")
 	},
